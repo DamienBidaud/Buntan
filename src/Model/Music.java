@@ -1,33 +1,60 @@
 package Model;
 
-public class Music {
+import gestion.ID3Tags;
 
-	private String name;
-	private String fileRoad;
+public class Music extends Media{
+	
+	private String artiste;
+	private String gender;
+	private ID3Tags tag;
+	private String albumName;
 	
 	public Music(String name, String fileRoad){
-		this.name = name;
-		this.fileRoad = fileRoad;
+		super(name, fileRoad);
+		tag = new ID3Tags(fileRoad);
+		this.artiste = tag.getArtist();
+		this.gender = tag.getGenre();
+		this.albumName = tag.getAlbum();
 	}
 
-	public String getName() {
-		return name;
+	public String getArtiste() {
+		return artiste;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setArtiste(String artiste) {
+		this.artiste = artiste;
+		tag.setArtist(artiste);
 	}
 
-	public String getFileRoad() {
-		return fileRoad;
+	public String getGender() {
+		return gender;
 	}
 
-	public void setFileRoad(String fileRoad) {
-		this.fileRoad = fileRoad;
+	public void setGender(String gender) {
+		this.gender = gender;
+		tag.setGenre(gender);
 	}
-	
-	public String toString(){
-		return "Name:"+this.name+", file:"+this.fileRoad;
+
+	public ID3Tags getTag() {
+		return tag;
 	}
-	
+
+	public void setTag(ID3Tags tag) {
+		this.tag = tag;
+	}
+
+	public String getAlbumName() {
+		return albumName;
+	}
+
+	public void setAlbumName(String albumName) {
+		this.albumName = albumName;
+		tag.setAlbum(albumName);
+	}
+
+	public void setName(String name){
+		super.setName(name);
+		tag.setSongName(name);
+	}
+
 }
