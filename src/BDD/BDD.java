@@ -188,5 +188,42 @@ public class BDD {
 		}
 	}
 	
-	
+	public void insertVideo(String name, String fileRoad, int id_user){
+		try{
+			int id = 0;
+			StringTokenizer st = new StringTokenizer(fileRoad, "\\");
+			fileRoad = "?";
+			while(st.hasMoreTokens()){
+				fileRoad += st.nextToken()+"\\\\";
+				
+			}
+			fileRoad += "\\";
+			fileRoad = fileRoad.substring(0, fileRoad.length()-1);
+
+			Statement state = conn.createStatement();
+			ResultSet result = state.executeQuery("SELECT id_media from media where Name like '"+name+"'");
+			if(!result.next()){
+				state.executeUpdate("INSERT INTO `media`(`Name`,`file_road`)VALUES('"+name+"','"+fileRoad+"')");				
+				result = state.executeQuery("SELECT id_media from media where Name like '"+name+"'");
+				result.next();
+				id = Integer.parseInt(result.getObject(1).toString());
+				state.executeUpdate("INSERT INTO `video`(`idmedia`)VALUES("+id+")");
+				state.executeUpdate("INSERT INTO `appartien`(`id_media_fk`, `id_user_fk`)VALUES("+id+", "+id_user+")");
+
+				result.close();
+				state.close();
+			}
+			else{
+				result = state.executeQuery("SELECT id_media from media where Name like '"+name+"'");
+				result.next();
+				id = Integer.parseInt(result.getObject(1).toString());
+				state.executeUpdate("INSERT INTO `appartien`(`id_media_fk`, `id_user_fk`)VALUES("+id+", "+id_user+")");
+				result.close();
+				state.close();
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
 }

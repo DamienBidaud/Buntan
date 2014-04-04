@@ -1,6 +1,7 @@
 package Vue;
 
 import gestion.ID3Tags;
+import it.sauronsoftware.jave.MultimediaInfo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -59,8 +61,10 @@ public class Window extends JFrame{
 	private JMenuItem item2 = new JMenuItem("Modifier Fichier");
 	private JMenuItem item3 = new JMenuItem("Afficher paramètre utilisateur");
 	private JMenuItem item4 = new JMenuItem("Option");
-
+	private JMenuItem item5 = new JMenuItem("ajouter video");
+	
 	private JTable table;
+	private JTable tableV;
 	private EcouteurAction tableListener = new EcouteurAction();
 	private ID3Tags test;
 	private LecteurAudio mp3;
@@ -70,7 +74,7 @@ public class Window extends JFrame{
 	private JTextArea songN;
 	private JTextArea genre;
 	private JTextArea artiste;
-	
+	private JTabbedPane jTab;
 	private int idUser;
 	
 	class WindowCloss implements WindowListener{
@@ -163,34 +167,64 @@ public class Window extends JFrame{
 				}
 				//refreshTabl(table.getSelectedRow(), m1);
 			}
-			else if(event.equals("Play")){
-				if(table.getSelectedRow() == -1){
-					JOptionPane jOP = new JOptionPane();
-					jOP.showMessageDialog(null, "Veuillez séléctionner une music", "Attention", JOptionPane.WARNING_MESSAGE);
-				}
-				else{
-					el = bd.selectMusic(idUser);
-					name = (String) el.get(table.getSelectedRow());
-					name = name.substring(1, name.length());
-					if(pauses == false){
-						setTrack(name);
-				       
-							mp3.go();
-						
+			if(jTab.getTitleAt(jTab.getSelectedIndex()).equals("Music")){
+
+				 if(event.equals("Play")){
+				
+					if(table.getSelectedRow() == -1){
+						JOptionPane jOP = new JOptionPane();
+						jOP.showMessageDialog(null, "Veuillez séléctionner une music", "Attention", JOptionPane.WARNING_MESSAGE);
 					}
 					else{
-							mp3.go();
-						
+						el = bd.selectMusic(idUser);
+						name = (String) el.get(table.getSelectedRow());
+						name = name.substring(1, name.length());
+						if(pauses == false){
+							setTrack(name);
+					       
+								mp3.go();
+							
+						}
+						else{
+								mp3.go();
+							
+						}
 					}
+				 }
+				
+				else if(event.equals("Pause")){
+				
+					pausedOnFrame = mp3.suspend();
+					pauses = true;
+				}
+				else{
+					mp3.close();
 				}
 			}
-			else if(event.equals("Pause")){
-			
-				pausedOnFrame = mp3.suspend();
-				pauses = true;
-			}
-			else{
-				mp3.close();
+			if(jTab.getTitleAt(jTab.getSelectedIndex()).equals("Video")){
+				if(event.equals("Play")){
+					if(tableV.getSelectedRow() == -1){
+						JOptionPane jOP = new JOptionPane();
+						jOP.showMessageDialog(null, "Veuillez séléctionner une music", "Attention", JOptionPane.WARNING_MESSAGE);
+					}
+					else{
+						
+						SwingUtilities.invokeLater(new Runnable() {
+					      	 
+				
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								//VideoPlayer vp =  new VideoPlayer("C:\\Users\\Damien\\Videos\\[Ichi Fansub] Seitokai Yakuindomo - 01 VOSTFR HD.avi");
+								ArrayList video = bd.selectVideo(idUser);
+								String file = (String) video.get(tableV.getSelectedRow());
+								file = file.substring(1, file.length()-1);
+								VideoPlayer vp = new VideoPlayer(file);
+								vp.start();
+							}
+					      });
+					}
+				}
 			}
 		}
 	}
@@ -211,7 +245,6 @@ public class Window extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			String event = e.getActionCommand();
-			System.out.println("test");
 			if(event.equals("ajouter music")){
 				JFileChooser filChose = new JFileChooser();
 				int retval = filChose.showDialog(filChose, null);
@@ -221,6 +254,17 @@ public class Window extends JFrame{
 				ID3Tags tag = new ID3Tags(file);
 				Object[] donne = new Object[]{table.getRowCount()+1, tag.getSongName(), tag.getTime(), tag.getArtist(), tag.getAlbum(), tag.getGenre()};
 				((MyTable) table.getModel()).addRow(donne);
+			}
+			if(event.equals("ajouter video")){
+//				File f = new File("C:\\Users\\Damien\\Videos\\[D-J-F] Hanazakari no kimitachi e Final Live Special vostf.avi");
+//				System.out.println(f.getName());
+				JFileChooser filChose = new JFileChooser();
+				int retval = filChose.showDialog(filChose, null);
+				String file = filChose.getSelectedFile().getAbsolutePath();
+				File f = new File(file);
+				bd.insertVideo(f.getName(), file, idUser);
+				Object[] donne = new Object[]{tableV.getRowCount()+1, f.getName()};
+				((MyTable) tableV.getModel()).addRow(donne);
 			}
 		}
 		
@@ -297,6 +341,8 @@ public class Window extends JFrame{
 		this.initisalise();
 		this.test1.add(item1);
 		item1.addActionListener(new menuListeneur());
+		this.test1.add(item5);
+		item5.addActionListener(new menuListeneur());
 		this.test1.add(item2);
 		this.test1_2.add(item4);
 		this.test2.add(item3);
@@ -506,7 +552,7 @@ public class Window extends JFrame{
 	
 	public JTabbedPane getPanelCenter(){
 		ArrayList media = bd.selectMusic(idUser);
-		JTabbedPane jTab = new JTabbedPane();
+		jTab = new JTabbedPane();
 		jPan2 = new JPanel();
 		jTab.add(jPan2,"Music");
 		String title[] = {"number","name", "time", "artiste", "album", "genre"};
@@ -532,10 +578,28 @@ public class Window extends JFrame{
 		scroll.setSize(750, 600);
 		jPan2.add(scroll);
 		
-		JPanel jPan2 = new JPanel();
-		jTab.add(jPan2, "Video");
+		JPanel jPan4 = new JPanel();
+		
+		jTab.add(jPan4, "Video");
+		ArrayList video = bd.selectVideo(idUser);
+		String title2[] = {"number", "name"};
+		String data2[][] = new String[media.size()][title2.length];
+		for(int i = 0; i < video.size(); i++){
+			file = ((String) video.get(i));
+			File f = new File(file);
+			data2[i][0] = i+1+"";
+			data2[i][1] = f.getName();
+		}
+		jPan4.setLayout(new GridLayout());
+		MyTable mtV = new MyTable(data2, title2);
+		tableV = new JTable(mtV);
+		table.setAutoCreateRowSorter(true);
+		JScrollPane scroll2 = new JScrollPane(tableV);
+		scroll2.setSize(750, 600);
+		jPan4.add(scroll2);
 		
 		JPanel jPan3 = new JPanel();
+		
 		jTab.add(jPan3, "Calendar");
 		jPan3.add(new Calandar());
 		return jTab;
