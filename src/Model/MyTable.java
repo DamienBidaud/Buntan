@@ -1,5 +1,10 @@
 package Model;
 
+import java.awt.Component;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 public class MyTable extends AbstractTableModel{
@@ -92,5 +97,7 @@ public class MyTable extends AbstractTableModel{
 	   public boolean isCellEditable(int row, int col){
 	      return true;
 	   }
+	   
+	  
 	
 }

@@ -41,13 +41,13 @@ public class BDD {
 		try {
 			ArrayList media = new ArrayList();
 			Statement state = (Statement) conn.createStatement();
-			ResultSet result = state.executeQuery("SELECT DISTINCT file_road FROM media,music,appartien where media.id_media = music.id_media and appartien.id_user_fk ="+idUser+"");
+			ResultSet result = state.executeQuery("SELECT DISTINCT file_road, note FROM media,music,appartien where media.id_media = music.id_media and media.id_media = appartien.id_media_fk and appartien.id_user_fk ="+idUser+"");
 			ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
 				         
-			while(result.next()){         
-				for(int i = 1; i <= resultMeta.getColumnCount(); i++){
-					media.add(result.getObject(i).toString());        
-				}
+			while(result.next()){ 
+					String[] obj = new String[]{result.getObject(1).toString(), result.getObject(2).toString()};
+					media.add(obj);        
+				
 			}
 
 			result.close();
@@ -60,16 +60,17 @@ public class BDD {
 		}
 	}
 	
+	
 	public ArrayList selectVideo(int idUser){
 		try {
 			ArrayList media = new ArrayList();
 			Statement state = (Statement) conn.createStatement();
-		    ResultSet result = state.executeQuery("SELECT DISTINCT file_road FROM media,video,appartien where media.id_media = video.idmedia and appartien.id_user_fk ="+idUser+"");
+		    ResultSet result = state.executeQuery("SELECT DISTINCT file_road,note FROM media,video,appartien where media.id_media = video.idmedia and media.id_media = appartien.id_media_fk and appartien.id_user_fk ="+idUser+"");
 		    ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
 				         
 		      while(result.next()){         
-		        for(int i = 1; i <= resultMeta.getColumnCount(); i++)
-		           media.add(result.getObject(i).toString());
+		    	  String[] obj = new String[]{result.getObject(1).toString(), result.getObject(2).toString()};
+		           media.add(obj);
 		            
 		      }
 
@@ -223,6 +224,46 @@ public class BDD {
 			}
 		}
 		catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateNote(int note, int idUser, int idMedia){
+
+		Statement state;
+		try {
+			state = conn.createStatement();
+			ResultSet result = state.executeQuery("SELECT id_media_fk from appartien where id_user_fk = "+idUser+"");
+			ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
+			int nb = 0;
+			int i = 0;
+			result.next();
+			do{
+				nb = Integer.parseInt(result.getObject(1).toString());
+				i++;
+			}while(result.next() && i != idMedia);
+			System.out.println(idMedia+"="+nb);
+			String update = "UPDATE `buntan`.`appartien` SET `note` = "+note+" WHERE `id_user_fk` = "+idUser+" and id_media_fk ="+nb;
+			System.out.println(state.executeUpdate(update));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteMusic(String name, int idUser){
+		Statement state;
+		
+		try {
+			state = conn.createStatement();
+			//System.out.println("SELECT id_media from media where file_road like '"+name+"'");
+			ResultSet result = state.executeQuery("SELECT id_media from media where Name like '"+name+"'");
+			result.next();
+			int id = Integer.parseInt(result.getObject(1).toString());
+			String del = "DELETE FROM appartien where id_user_fk="+idUser+" and id_media_fk="+id+"";
+			state.executeUpdate(del);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

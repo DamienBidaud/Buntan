@@ -5,6 +5,7 @@ import it.sauronsoftware.jave.MultimediaInfo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -12,6 +13,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxEditor;
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -46,6 +51,7 @@ import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
 import BDD.BDD;
+import Model.CelluleTable;
 import Model.Music;
 import Model.MyTable;
 
@@ -62,6 +68,7 @@ public class Window extends JFrame{
 	private JMenuItem item3 = new JMenuItem("Afficher paramètre utilisateur");
 	private JMenuItem item4 = new JMenuItem("Option");
 	private JMenuItem item5 = new JMenuItem("ajouter video");
+	private JMenuItem item6 = new JMenuItem("Suprimer média");
 	
 	private JTable table;
 	private JTable tableV;
@@ -75,7 +82,9 @@ public class Window extends JFrame{
 	private JTextArea genre;
 	private JTextArea artiste;
 	private JTabbedPane jTab;
+	private JComboBox play;
 	private int idUser;
+	
 	
 	class WindowCloss implements WindowListener{
 
@@ -158,7 +167,8 @@ public class Window extends JFrame{
 					
 					table.getValueAt(table.getSelectedRow(), 0);
 					el = bd.selectMusic(idUser);
-					name = (String) el.get(table.getSelectedRow());
+					String[] val =  (String[]) el.get(table.getSelectedRow());
+					name = val[0];
 					name = name.substring(1, name.length());
 					ChangeTag  change = new ChangeTag(name);
 					change.addWindowListener(new WindowCloss(name));
@@ -177,7 +187,8 @@ public class Window extends JFrame{
 					}
 					else{
 						el = bd.selectMusic(idUser);
-						name = (String) el.get(table.getSelectedRow());
+						String[] val =  (String[]) el.get(table.getSelectedRow());
+						name = val[0];
 						name = name.substring(1, name.length());
 						if(pauses == false){
 							setTrack(name);
@@ -252,7 +263,7 @@ public class Window extends JFrame{
 				//System.out.println(file);
 				bd.insertMusic(filChose.getSelectedFile().getName(), file, idUser);
 				ID3Tags tag = new ID3Tags(file);
-				Object[] donne = new Object[]{table.getRowCount()+1, tag.getSongName(), tag.getTime(), tag.getArtist(), tag.getAlbum(), tag.getGenre()};
+				Object[] donne = new Object[]{table.getRowCount()+1, tag.getSongName(), tag.getTime(), tag.getArtist(), tag.getAlbum(), tag.getGenre(), "0"};
 				((MyTable) table.getModel()).addRow(donne);
 			}
 			if(event.equals("ajouter video")){
@@ -263,11 +274,42 @@ public class Window extends JFrame{
 				String file = filChose.getSelectedFile().getAbsolutePath();
 				File f = new File(file);
 				bd.insertVideo(f.getName(), file, idUser);
-				Object[] donne = new Object[]{tableV.getRowCount()+1, f.getName()};
+				Object[] donne = new Object[]{tableV.getRowCount()+1, f.getName(), "0"};
 				((MyTable) tableV.getModel()).addRow(donne);
 			}
+			if(event.equals("Suprimer média")){
+				if(jTab.getTitleAt(jTab.getSelectedIndex()).equals("Music")){
+					if(table.getSelectedRow() == -1){
+						JOptionPane jOP = new JOptionPane();
+						jOP.showMessageDialog(null, "Veuillez séléctionner une music", "Attention", JOptionPane.WARNING_MESSAGE);
+					}
+					else{
+						ArrayList el = bd.selectMusic(idUser);
+						String[] val =  (String[]) el.get(table.getSelectedRow());
+						File f = new File(val[0]);
+						String name = f.getName();
+						//name = name.substring(1, name.length());
+						bd.deleteMusic(name, idUser);
+						((MyTable) table.getModel()).removeRow(table.getSelectedRow());
+					}
+				}
+				else{
+					if(tableV.getSelectedRow() == -1){
+						JOptionPane jOP = new JOptionPane();
+						jOP.showMessageDialog(null, "Veuillez séléctionner une music", "Attention", JOptionPane.WARNING_MESSAGE);
+					}
+					else{
+						ArrayList el = bd.selectVideo(idUser);
+						String[] val =  (String[]) el.get(tableV.getSelectedRow());
+						File f = new File(val[0]);
+						String name = f.getName();
+						//name = name.substring(1, name.length());
+						bd.deleteMusic(name, idUser);
+						((MyTable) tableV.getModel()).removeRow(tableV.getSelectedRow());					}
+				}
+			}
 		}
-		
+			
 	}
 	
 	class RechercheListeneur implements ActionListener{
@@ -278,12 +320,13 @@ public class Window extends JFrame{
 			
 			ArrayList media = bd.selectMusic(idUser);
 			String file;
-			String title[] = {"number","name", "time", "artiste", "album", "genre"};
+			String title[] = {"number","name", "time", "artiste", "album", "genre", "Note"};
 			ArrayList <ID3Tags>music = new ArrayList<ID3Tags>();
 			ArrayList <ID3Tags>affiche = new ArrayList<ID3Tags>();
 			String data[][] = new String[affiche.size()][title.length];
 			for(int i = 0; i < media.size(); i++){
-				file = ((String) media.get(i));
+				String[] ch = (String[]) media.get(i);
+				file = ch[0];
 				file = file.substring(1,file.length() );
 				music.add(new ID3Tags(file));
 			}
@@ -295,11 +338,10 @@ public class Window extends JFrame{
 				}
 			}
 			if(!songN.getText().equals("")){
-				System.out.println("test");
 				for(int i = 0; i <music.size(); i++){
-					if(music.get(i).getSongName().equals(songN.getText()) || true){
+					if(music.get(i).getSongName().equals(songN.getText())){
 						affiche.add(music.get(i));
-						System.out.println(music.get(i).getArtist());
+						System.out.println(music.get(i).getSongName());
 					}
 				}
 			}
@@ -317,19 +359,21 @@ public class Window extends JFrame{
 					}
 				}
 			}
-			for(int i = 0; i< affiche.size(); i++){
-				data[i][0] = i+1+"";
-				data[i][1] = test.getSongName();
-				data[i][2] = test.getTime();
-				data[i][3] = test.getArtist();
-				data[i][4] = test.getAlbum();
-				data[i][5] = test.getGenre();
-			}
-			table = new JTable(data, title);
-			jPan2.add(table);
-			jPan2.validate();
-			jPan2.repaint();
+			refreshRescherche(affiche);
 		}
+		
+	}
+	
+	class NoteListeneur implements ItemListener{
+
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			// TODO Auto-generated method stub
+			//System.out.println(play.getSelectedItem());
+			bd.updateNote(Integer.parseInt((String) play.getSelectedItem()), idUser, table.getSelectedRow()+1);
+		}
+
+		
 		
 	}
 	
@@ -343,6 +387,8 @@ public class Window extends JFrame{
 		item1.addActionListener(new menuListeneur());
 		this.test1.add(item5);
 		item5.addActionListener(new menuListeneur());
+		this.test1.add(item6);
+		item6.addActionListener(new menuListeneur());
 		this.test1.add(item2);
 		this.test1_2.add(item4);
 		this.test2.add(item3);
@@ -555,12 +601,21 @@ public class Window extends JFrame{
 		jTab = new JTabbedPane();
 		jPan2 = new JPanel();
 		jTab.add(jPan2,"Music");
-		String title[] = {"number","name", "time", "artiste", "album", "genre"};
-		String data[][] = new String[media.size()][title.length];
+		String title[] = {"number","name", "time", "artiste", "album", "genre", "note"};
+		Object data[][] = new String[media.size()][title.length];
+		play = new JComboBox();
+		play.addItem("0");
+		play.addItem("1");
+		play.addItem("2");
+		play.addItem("3");
+		play.addItem("4");
+		play.addItem("5");
+		play.addItemListener(new NoteListeneur());
 		String file = "";
 		String el;
 		for(int i = 0; i < media.size(); i++ ){
-			file = ((String) media.get(i));
+			String[] fich = (String[]) media.get(i);
+			file = fich[0];
 			file = file.substring(1,file.length() );
 			test = new ID3Tags(file);
 			data[i][0] = i+1+"";
@@ -569,10 +624,12 @@ public class Window extends JFrame{
 			data[i][3] = test.getArtist();
 			data[i][4] = test.getAlbum();
 			data[i][5] = test.getGenre();
+			data[i][6] = fich[1];
 		}
 		jPan2.setLayout(new GridLayout());
 		MyTable mt = new MyTable(data, title);
 		table = new JTable(mt);
+		this.table.getColumn("note").setCellEditor(new DefaultCellEditor(play));
 		table.setAutoCreateRowSorter(true);	
 		JScrollPane  scroll = new JScrollPane(table);
 		scroll.setSize(750, 600);
@@ -582,17 +639,19 @@ public class Window extends JFrame{
 		
 		jTab.add(jPan4, "Video");
 		ArrayList video = bd.selectVideo(idUser);
-		String title2[] = {"number", "name"};
+		String title2[] = {"number", "name", "note"};
 		String data2[][] = new String[media.size()][title2.length];
 		for(int i = 0; i < video.size(); i++){
-			file = ((String) video.get(i));
-			File f = new File(file);
+			String[] vid = (String[]) video.get(i);
+			File f = new File(vid[0]);
 			data2[i][0] = i+1+"";
 			data2[i][1] = f.getName();
+			data2[i][2] = vid[1];
 		}
 		jPan4.setLayout(new GridLayout());
 		MyTable mtV = new MyTable(data2, title2);
 		tableV = new JTable(mtV);
+		this.tableV.getColumn("note").setCellEditor(new DefaultCellEditor(play));
 		table.setAutoCreateRowSorter(true);
 		JScrollPane scroll2 = new JScrollPane(tableV);
 		scroll2.setSize(750, 600);
@@ -616,11 +675,11 @@ public class Window extends JFrame{
 			file = ((String) media.get(i));
 			file = file.substring(1,file.length() );
 			test = new ID3Tags(file);
-			data[i][0] = test.getSongName();
-			data[i][1] = test.getTime();
-			data[i][2] = test.getArtist();
-			data[i][3] = test.getAlbum();
-			data[i][4] = test.getGenre();
+			data[i][1] = test.getSongName();
+			data[i][2] = test.getTime();
+			data[i][3] = test.getArtist();
+			data[i][4] = test.getAlbum();
+			data[i][5] = test.getGenre();
 		}
 		table = new JTable(data, title);
 		table.revalidate();
@@ -635,6 +694,21 @@ public class Window extends JFrame{
 		table.setValueAt(tag.getArtist(), table.getSelectedRow(), 3);
 		table.setValueAt(tag.getAlbum(), table.getSelectedRow(), 4);
 		table.setValueAt(tag.getGenre(), table.getSelectedRow(), 5);
+		table.revalidate();
+		table.repaint();
+	}
+	
+	public void refreshRescherche(ArrayList<ID3Tags> aff){
+		for(int i = 0; i < table.getRowCount(); i++){
+			((MyTable) table.getModel()).removeRow(i);
+			
+		}
+		table.revalidate();
+		table.repaint();
+		for(int i = 0; i < aff.size(); i++){
+			Object[] donne = new Object[]{i+1, aff.get(i).getSongName(), aff.get(i).getTime(), aff.get(i).getArtist(), aff.get(i).getAlbum(), aff.get(i).getGenre()};
+			((MyTable) table.getModel()).addRow(donne);
+		}
 		table.revalidate();
 		table.repaint();
 	}
