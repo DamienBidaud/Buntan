@@ -27,7 +27,6 @@ public class UserIdentification extends JFrame{
 	private JTextField t1;
 	private JPasswordField t2;
 	
-	
 	public class UserListener implements ActionListener{
 
 		@Override
@@ -49,14 +48,16 @@ public class UserIdentification extends JFrame{
 				CreatUser cu = new CreatUser();	
 			}
 		}
-		
 	}
 	
 	public UserIdentification(){
 		this.setTitle("Buntan");
-		this.setSize(700, 500);
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setSize(600, 480);
 		//this.setIconImage(new ImageIcon(this.getClass().getResource("logoProjet.png")).getImage());
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        this.setIconImage(new ImageIcon("./src/images/icone.png").getImage());
 		this.initialise();
 		this.setVisible(true);
 	}
@@ -72,55 +73,49 @@ public class UserIdentification extends JFrame{
 		jPan.setLayout(new GridBagLayout());
 		GridBagConstraints containt = new GridBagConstraints();
 		
-		JLabel labl1 = new JLabel("User name:");
-		containt.fill = GridBagConstraints.HORIZONTAL;
-		containt.gridx = 0;
-		containt.gridy = 0;
-		containt.weighty = 1.0;
-		jPan.add(labl1, containt);
-		t1 = new JTextField();
-		containt.fill = GridBagConstraints.HORIZONTAL;
-		containt.weightx = 1.0;
-		containt.weighty = 1.0;
-		containt.gridwidth = 1;
+		containt.insets = new Insets(6, 3, 3, 3);
+		
+		JLabel image = new JLabel(new ImageIcon("./src/images/buntan.jpg"));
+		JButton b = new JButton("Image");
 		containt.gridx = 1;
 		containt.gridy = 0;
+		containt.gridwidth = 2;
+		containt.fill = GridBagConstraints.HORIZONTAL;
+		jPan.add(image, containt);
+		
+		JLabel labl1 = new JLabel("User name:");
+		containt.gridx = 1;
+		containt.gridy = 1;
+		containt.gridwidth = 1;
+		jPan.add(labl1, containt);
+		t1 = new JTextField();
+		containt.gridx = 2;
+		containt.gridy = 1;
+		containt.gridwidth = 1;
 		jPan.add(t1, containt);
 		
 		JLabel label2 = new JLabel("Password:");
-		containt.fill = GridBagConstraints.HORIZONTAL;
-		containt.weightx = 0.0;
-		containt.weighty = 1.0;
+		containt.gridx = 1;
+		containt.gridy = 2;
 		containt.gridwidth = 1;
-		containt.gridx = 0;
-		containt.gridy = 1;
 		jPan.add(label2, containt);
 		t2 = new JPasswordField();
-		containt.fill = GridBagConstraints.HORIZONTAL;
-		containt.weightx = 0.0;
-		containt.weighty = 1.0;
+		containt.gridx = 2;
+		containt.gridy = 2;
 		containt.gridwidth = 1;
-		containt.gridx = 1;
-		containt.gridy = 1;
 		jPan.add(t2, containt);
 		
 		JButton b1 = new JButton("Connection");
-		containt.fill = GridBagConstraints.HORIZONTAL;
-		containt.weightx = 0.0;
-		containt.weighty = 1.0;
+		containt.gridx = 1;
+		containt.gridy = 3;
 		containt.gridwidth = 1;
-		containt.gridx = 0;
-		containt.gridy = 4;
 		b1.addActionListener(new UserListener());
 		jPan.add(b1, containt);
 		
 		JButton b2 = new JButton("Create acount");
-		containt.fill = GridBagConstraints.HORIZONTAL;
-		containt.weightx = 0.0;
-		containt.weighty = 1.0;
-		containt.gridwidth = 1;
 		containt.gridx = 2;
-		containt.gridy = 4;
+		containt.gridy = 3;
+		containt.gridwidth = 1;
 		b2.addActionListener(new UserListener());
 		jPan.add(b2, containt);
 		return jPan;
