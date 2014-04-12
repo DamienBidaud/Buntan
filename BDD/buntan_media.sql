@@ -38,7 +38,6 @@ CREATE TABLE `media` (
 
 LOCK TABLES `media` WRITE;
 /*!40000 ALTER TABLE `media` DISABLE KEYS */;
-INSERT INTO `media` VALUES ('You\'re Beautiful',1,'‪C:\\Users\\Damien\\Music\\02 - You\'re Beautiful.mp3'),('Young Volcanoes',2,'‪C:\\Users\\Damien\\Music\\09 - Young Volcanoes.mp3'),('Some Kind of Beautiful',3,'‪C:\\Users\\Damien\\Music\\Some Kind of Beautiful.mp3');
 /*!40000 ALTER TABLE `media` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
