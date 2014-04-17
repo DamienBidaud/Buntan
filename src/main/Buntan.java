@@ -11,11 +11,11 @@ public class Buntan {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		//UserIdentification id = new UserIdentification();
+		UserIdentification id = new UserIdentification();
 		
-		JFileChooser jfc = new JFileChooser();
-		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		jfc.showDialog(jfc, null);
+//		PluginLoader pl = new PluginLoader();
+//		String[] files = new String[]{"‪C:\\Users\\Damien\\Desktop\\pluginTest.jar"};
+//		pl.setFiles(files);
 	}
 }
 

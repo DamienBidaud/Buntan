@@ -47,6 +47,8 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import plugin.IModule;
+import plugin.PluginLoader;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
@@ -57,7 +59,7 @@ import Model.MyTable;
 
 public class Window extends JFrame{
 
-	
+	private ArrayList pluginArray = new ArrayList();
 	private JMenuBar menuBar = new JMenuBar();
 	private JMenu test1 = new JMenu("Fichier");
 	private JMenu test1_2 = new JMenu("Edition");
@@ -69,6 +71,7 @@ public class Window extends JFrame{
 	private JMenuItem item4 = new JMenuItem("Option");
 	private JMenuItem item5 = new JMenuItem("ajouter video");
 	private JMenuItem item6 = new JMenuItem("Suprimer média");
+	private JMenuItem item7 = new JMenuItem("Ajouter Plugin");
 	
 	private JTable table;
 	private JTable tableV;
@@ -84,6 +87,8 @@ public class Window extends JFrame{
 	private JTabbedPane jTab;
 	private JComboBox play;
 	private int idUser;
+	
+	private PluginLoader pl = new PluginLoader();
 	
 	
 	class WindowCloss implements WindowListener{
@@ -177,6 +182,7 @@ public class Window extends JFrame{
 				}
 				//refreshTabl(table.getSelectedRow(), m1);
 			}
+			
 			if(jTab.getTitleAt(jTab.getSelectedIndex()).equals("Music")){
 
 				 if(event.equals("Play")){
@@ -228,9 +234,10 @@ public class Window extends JFrame{
 								// TODO Auto-generated method stub
 								//VideoPlayer vp =  new VideoPlayer("C:\\Users\\Damien\\Videos\\[Ichi Fansub] Seitokai Yakuindomo - 01 VOSTFR HD.avi");
 								ArrayList video = bd.selectVideo(idUser);
-								String file = (String) video.get(tableV.getSelectedRow());
-								file = file.substring(1, file.length()-1);
-								VideoPlayer vp = new VideoPlayer(file);
+								String[] file = (String[]) video.get(tableV.getSelectedRow());
+								String name = file[0];
+								name = name.substring(1, name.length()-1);
+								VideoPlayer vp = new VideoPlayer(name);
 								vp.start();
 							}
 					      });
@@ -308,6 +315,27 @@ public class Window extends JFrame{
 						((MyTable) tableV.getModel()).removeRow(tableV.getSelectedRow());					}
 				}
 			}
+			if(event.equals("Ajouter Plugin")){
+				JFileChooser filChose = new JFileChooser();
+				int retval = filChose.showDialog(filChose, null);
+				String file = filChose.getSelectedFile().getAbsolutePath();
+				pl.setFiles(file);
+				try {
+					fillPlugin(pl.loadAllSimpleModules());
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+		
+		public void fillPlugin(IModule[] plugin){
+			for(int i = 0;i < plugin.length; i++){
+				pluginArray.add(plugin[i]);
+				plugin[i].setIdUser(idUser);
+				test1.add(plugin[i].getItem());
+				jTab.add(plugin[i].plug(), plugin[i].getName());
+			}
 		}
 			
 	}
@@ -336,6 +364,8 @@ public class Window extends JFrame{
 						affiche.add(music.get(i));
 					}
 				}
+				if(!affiche.isEmpty())
+					refreshRescherche(affiche);
 			}
 			if(!songN.getText().equals("")){
 				for(int i = 0; i <music.size(); i++){
@@ -344,6 +374,8 @@ public class Window extends JFrame{
 						System.out.println(music.get(i).getSongName());
 					}
 				}
+				if(!affiche.isEmpty())
+					refreshRescherche(affiche);
 			}
 			if(!genre.getText().equals("")){
 				for(int i = 0; i <music.size(); i++){
@@ -351,6 +383,8 @@ public class Window extends JFrame{
 						affiche.add(music.get(i));
 					}
 				}
+				if(!affiche.isEmpty())
+					refreshRescherche(affiche);
 			}
 			if(!artiste.getText().equals("")){
 				for(int i = 0; i <music.size(); i++){
@@ -358,8 +392,10 @@ public class Window extends JFrame{
 						affiche.add(music.get(i));
 					}
 				}
+				if(!affiche.isEmpty())
+					refreshRescherche(affiche);
 			}
-			refreshRescherche(affiche);
+			
 		}
 		
 	}
@@ -390,12 +426,14 @@ public class Window extends JFrame{
 		this.test1.add(item6);
 		item6.addActionListener(new menuListeneur());
 		this.test1.add(item2);
-		this.test1_2.add(item4);
 		this.test2.add(item3);
+		this.test1_2.add(item7);
+		item7.addActionListener(new menuListeneur());
 		this.menuBar.add(test1);
 		this.menuBar.add(test1_2);
 		this.menuBar.add(test2);
 		this.setJMenuBar(menuBar);
+		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
 		//setIconImage(new ImageIcon(this.getClass().getResource("mainicon.png")).getImage());
 		this.setVisible(true);
 	}
@@ -699,13 +737,15 @@ public class Window extends JFrame{
 	}
 	
 	public void refreshRescherche(ArrayList<ID3Tags> aff){
-		for(int i = 0; i < table.getRowCount(); i++){
-			((MyTable) table.getModel()).removeRow(i);
-			
+		while(table.getRowCount() != 1){
+			for(int i = 0; i < table.getRowCount(); i++){
+				((MyTable) table.getModel()).removeRow(i);
+				table.revalidate();
+				table.repaint();
+			}
 		}
-		table.revalidate();
-		table.repaint();
-		for(int i = 0; i < aff.size(); i++){
+
+		for(int i = 0; i < aff.size()-1; i++){
 			Object[] donne = new Object[]{i+1, aff.get(i).getSongName(), aff.get(i).getTime(), aff.get(i).getArtist(), aff.get(i).getAlbum(), aff.get(i).getGenre()};
 			((MyTable) table.getModel()).addRow(donne);
 		}

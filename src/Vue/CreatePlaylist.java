@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -32,6 +33,7 @@ public class CreatePlaylist extends JFrame{
 	public CreatePlaylist(){
 		this.setTitle("Buntan");
 		this.setSize(700, 500);
+		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.initisalise();
 		this.setVisible(true);

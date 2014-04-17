@@ -245,6 +245,8 @@ public class BDD {
 			System.out.println(idMedia+"="+nb);
 			String update = "UPDATE `buntan`.`appartien` SET `note` = "+note+" WHERE `id_user_fk` = "+idUser+" and id_media_fk ="+nb;
 			System.out.println(state.executeUpdate(update));
+			state.close();
+	
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -262,6 +264,7 @@ public class BDD {
 			int id = Integer.parseInt(result.getObject(1).toString());
 			String del = "DELETE FROM appartien where id_user_fk="+idUser+" and id_media_fk="+id+"";
 			state.executeUpdate(del);
+			state.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

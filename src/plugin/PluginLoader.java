@@ -5,74 +5,109 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import javax.swing.JFileChooser;
 
+import com.sun.media.ModuleListener;
+
 public class PluginLoader {
 
-	private static ArrayList<URL> urls = new ArrayList<URL>();
+	private String files;
 	
-	private static ClassLoader classLoader;
+	private ArrayList classPlugin;
 	
-	private static ArrayList<String> getModulClasses(){
-		ArrayList<String> classes = new ArrayList<String>();
-		
-		JFileChooser jfc = new JFileChooser();
-		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		jfc.showDialog(jfc, null);
-		
-		File[] files = new File(jfc.getName()).listFiles(new ModuleFilter());
-		
-		for(File f: files){
-			JarFile jf = null;
-			
-			try{
-				jf = new JarFile(f);
-				
-				Manifest manifest = jf.getManifest();
-				
-				String modulClasseName = manifest.getMainAttributes().getValue("Module-Class");
-				
-				classes.add(modulClasseName);
-				
-				urls.add(f.toURI().toURL());
-			}
-			catch(IOException e){
-				e.printStackTrace(); 
-			}
-			finally{
-				if(jf != null){
-					try{
-						jf.close();
-					}
-					catch(IOException e){
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		return classes;
+	public PluginLoader(){
+		this.classPlugin = new ArrayList<>();
+	}
+
+	public PluginLoader(String files){
+		this.files = files;
 	}
 	
-	private static class ModuleFilter implements FileFilter { 
-		@Override 
-		public boolean accept(File file) { 
-			return file.isFile() && file.getName().toLowerCase().endsWith(".jar"); 
-		} 
-	} 
+	public void setFiles(String files){
+		this.files = files;	
+	}
 	
+	public PluginBuntan[] loadAllSimpleModules() throws Exception{
+		this.initializeLoader();
+		PluginBuntan[] tmpPlugin = new PluginBuntan[this.classPlugin.size()];
+		
+		for(int i = 0; i < tmpPlugin.length; i++){
+			tmpPlugin[i] = (PluginBuntan) ((Class)this.classPlugin.get(i)).newInstance();
+		}
+		
+		return tmpPlugin;
+		
+	}
 	
-	public static ArrayList loadModules(){
+	public void initializeLoader() throws Exception{
+		if(this.files == null || this.files == null ){
+			throw new Exception("Pas de fichier spécifié");
+		}
 		
-		ArrayList modules = new ArrayList<>();
+		if(this.classPlugin.size() != 0 ){
+			return ;
+		}
+		File f = new File(this.files);
+		//Pour charger le .jar en memoire
+		URLClassLoader loader;
+		//Pour la comparaison de chaines
+		String tmp = "";
+		//Pour le contenu de l'archive jar
+		Enumeration enumeration;
+		//Pour déterminé quels sont les interfaces implémentées
+		Class tmpClass = null;
 		
+			
+						
+			URL u = f.toURI().toURL();
+
+			//On créer un nouveau URLClassLoader pour charger le jar qui se trouve ne dehors du CLASSPATH
+			loader = new URLClassLoader(new URL[] {u}); 
+			
+			//On charge le jar en mémoire
+			JarFile jar = new JarFile(f.getAbsolutePath());
+
+			//On récupére le contenu du jar
+			enumeration = jar.entries();
+			
+			do{
+				
+				tmp = enumeration.nextElement().toString();
+
+				//On vérifie que le fichier courant est un .class (et pas un fichier d'informations du jar )
+				if(tmp.length() > 6 && tmp.substring(tmp.length()-6).compareTo(".class") == 0) {
+					
+					tmp = tmp.substring(0,tmp.length()-6);
+					tmp = tmp.replaceAll("/",".");
+					
+					tmpClass = Class.forName(tmp ,true,loader);
+					
+					for(int i = 0 ; i < tmpClass.getInterfaces().length; i ++ ){
+						
+						//Une classe ne doit pas appartenir à deux catégories de plugins différents. 
+						//Si tel est le cas on ne la place que dans la catégorie de la première interface correct
+						// trouvée
+						//System.out.println(tmpClass.getInterfaces()[i].getName().toString());
+
+						if(tmpClass.getInterfaces()[i].getName().toString().equals("plugin.IModule") ) {
+							this.classPlugin.add(tmpClass);
+						}
+						
+					}
+					
+				}
+			
+			
 		
-		ArrayList<String> classes = getModulClasses();
+		}while(enumeration.hasMoreElements());
 		
-		
-		return modules;
 	}
 }

@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import gestion.ID3Tags;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,6 +57,7 @@ public class CreatUser extends JFrame{
 	public CreatUser(){
 		this.setTitle("Buntan");
 		this.setSize(600, 400);
+		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setVisible(true);		
 		this.initisalise();

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,6 +58,7 @@ public class ChangeTag extends JFrame{
 		music = new ID3Tags(m);
 		this.setTitle(music.getSongName());
 		this.setSize(600, 400);
+		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setVisible(true);		
 		this.initisalise();
