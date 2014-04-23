@@ -69,6 +69,7 @@ public class VideoPlayer extends JFrame{
 	                    pi.mediaPlayer().release();
 	                }
 	                factory.release();
+	                mainFrame.dispose();
 	                
 	            }
 	        });

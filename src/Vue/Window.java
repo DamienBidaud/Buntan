@@ -20,6 +20,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -87,6 +88,7 @@ public class Window extends JFrame{
 	private JTabbedPane jTab;
 	private JComboBox play;
 	private int idUser;
+	private String pluginFolder;
 	
 	private PluginLoader pl = new PluginLoader();
 	
@@ -244,6 +246,7 @@ public class Window extends JFrame{
 					}
 				}
 			}
+			
 		}
 	}
 	
@@ -322,10 +325,12 @@ public class Window extends JFrame{
 				pl.setFiles(file);
 				try {
 					fillPlugin(pl.loadAllSimpleModules());
+					Files.copy(new File(file).toPath(), new File(pluginFolder).toPath());
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
 			}
 		}
 		
@@ -413,12 +418,28 @@ public class Window extends JFrame{
 		
 	}
 	
+	class RefreshListeneur implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			String event = e.getActionCommand();
+			if(event.equals("Refresh")){
+				ArrayList media = bd.selectMusic(idUser);
+				
+				refresch(media);
+			}
+		}
+		
+	}
+	
 	public Window(int idUser){
 		this.setTitle("Buntan");
 		this.setSize(700, 500);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.idUser = idUser;
 		this.initisalise();
+		this.checkPlugin();
 		this.test1.add(item1);
 		item1.addActionListener(new menuListeneur());
 		this.test1.add(item5);
@@ -427,16 +448,15 @@ public class Window extends JFrame{
 		item6.addActionListener(new menuListeneur());
 		this.test1.add(item2);
 		this.test2.add(item3);
-		this.test1_2.add(item7);
-		item7.addActionListener(new menuListeneur());
 		this.menuBar.add(test1);
-		this.menuBar.add(test1_2);
 		this.menuBar.add(test2);
 		this.setJMenuBar(menuBar);
 		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
 		//setIconImage(new ImageIcon(this.getClass().getResource("mainicon.png")).getImage());
+		this.pluginFolder = "C:\\Users\\Damien\\Documents\\Développement\\Buntan\\Plugin";
 		this.setVisible(true);
 	}
+	
 	
 	
 	public void initisalise(){
@@ -549,13 +569,23 @@ public class Window extends JFrame{
 		b7.addActionListener(new RechercheListeneur());
 		jPan.add(b7, containt);
 		
-		JLabel b5 = new JLabel("playlist:");
+		JButton b8 = new JButton("Refresh");
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.weightx = 0.0;
 		containt.weighty = 1.0;
 		containt.gridwidth = 3;
 		containt.gridx = 0;
 		containt.gridy = 9;
+		b8.addActionListener(new RefreshListeneur());
+		jPan.add(b8, containt);
+		
+		JLabel b5 = new JLabel("playlist:");
+		containt.fill = GridBagConstraints.HORIZONTAL;
+		containt.weightx = 0.0;
+		containt.weighty = 1.0;
+		containt.gridwidth = 3;
+		containt.gridx = 0;
+		containt.gridy = 10;
 		jPan.add(b5, containt);
 		JComboBox play = new JComboBox();
 		play.addItem("Disney");
@@ -564,7 +594,7 @@ public class Window extends JFrame{
 		containt.weighty = 1.0;
 		containt.gridwidth = 3;
 		containt.gridx = 0;
-		containt.gridy = 10;
+		containt.gridy = 11;
 		jPan.add(play, containt);
 		
 		
@@ -574,7 +604,7 @@ public class Window extends JFrame{
 		containt.weighty = 1.0;
 		containt.gridwidth = 3;
 		containt.gridx = 0;
-		containt.gridy = 11;
+		containt.gridy = 12;
 		jPan.add(b6, containt);
 		
 		return jPan;
@@ -753,4 +783,50 @@ public class Window extends JFrame{
 		table.repaint();
 	}
 
+	public void refresch(ArrayList aff){
+		String file;
+		ArrayList <ID3Tags>music = new ArrayList<ID3Tags>();
+		while(table.getRowCount() != 1){
+			for(int i = 0; i < table.getRowCount(); i++){
+				((MyTable) table.getModel()).removeRow(i);
+				table.revalidate();
+				table.repaint();
+			}
+		}
+		for(int i = 0; i < aff.size(); i++){
+			String[] ch = (String[]) aff.get(i);
+			file = ch[0];
+			file = file.substring(1,file.length() );
+			ID3Tags el = new ID3Tags(file);
+			Object[] donne = new Object[]{i+1, el.getSongName(), el.getTime(), el.getArtist(), el.getAlbum(), el.getGenre(), ch[1]};
+			((MyTable) table.getModel()).addRow(donne);
+		}
+		table.revalidate();
+		table.repaint();
+	}
+	public void checkPlugin(){
+		File dossier = new File("Plugin"); 
+		if(!dossier.exists()){
+			System.out.println("Existe pas");
+		}
+		else{
+			File[] plug = dossier.listFiles();
+			for(int i = 0; i<plug.length; i++){
+				pl.setFiles(plug[i].getAbsolutePath());
+				try {
+					IModule[] plugin = pl.loadAllSimpleModules();
+					for(int j = 0;j < plugin.length; j++){
+						pluginArray.add(plugin[j]);
+						plugin[j].setIdUser(idUser);
+						test1.add(plugin[j].getItem());
+						jTab.add(plugin[j].plug(), plugin[j].getName());
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+	}
+	
 }
