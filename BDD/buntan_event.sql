@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS `event`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `event` (
   `idEvent` int(11) NOT NULL AUTO_INCREMENT,
+  `name_event` varchar(255) NOT NULL,
   `description_event` varchar(255) DEFAULT NULL,
   `date_event` date DEFAULT NULL,
   PRIMARY KEY (`idEvent`)
