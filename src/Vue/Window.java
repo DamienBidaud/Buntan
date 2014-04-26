@@ -436,6 +436,9 @@ public class Window extends JFrame{
 	public Window(int idUser){
 		this.setTitle("Buntan");
 		this.setSize(700, 500);
+		this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        this.setIconImage(new ImageIcon("./src/images/icone.png").getImage());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.idUser = idUser;
 		this.initisalise();
@@ -451,8 +454,6 @@ public class Window extends JFrame{
 		this.menuBar.add(test1);
 		this.menuBar.add(test2);
 		this.setJMenuBar(menuBar);
-		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
-		//setIconImage(new ImageIcon(this.getClass().getResource("mainicon.png")).getImage());
 		this.pluginFolder = "C:\\Users\\Damien\\Documents\\Développement\\Buntan\\Plugin";
 		this.setVisible(true);
 	}
@@ -522,7 +523,7 @@ public class Window extends JFrame{
 		
 		
 		
-		JLabel b3 = new JLabel("albume:");
+		JLabel b3 = new JLabel("album :");
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.weightx = 0.0;
 		containt.weighty = 1.0;

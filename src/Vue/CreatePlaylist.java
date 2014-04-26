@@ -33,7 +33,9 @@ public class CreatePlaylist extends JFrame{
 	public CreatePlaylist(){
 		this.setTitle("Buntan");
 		this.setSize(700, 500);
-		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
+		this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        this.setIconImage(new ImageIcon("./src/images/icone.png").getImage());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.initisalise();
 		this.setVisible(true);

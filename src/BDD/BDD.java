@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
@@ -270,4 +269,107 @@ public class BDD {
 			e.printStackTrace();
 		}
 	}
+	
+	public void insertEvent(String nameEv, String descriptionEv, String dateEv){
+		try {
+			Statement state = conn.createStatement();
+			state.executeUpdate("INSERT INTO `event`(`name_event`,`description_event`,`date_event`)VALUES('"+nameEv+"', '"+descriptionEv+"', '"+dateEv+"')");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void insertRelationEventToUser(int idUser, int idEvent){
+		try {
+			Statement state = conn.createStatement();
+			state.executeUpdate("INSERT INTO `event_user`(`event_user_iduesr`,`event_user_idevent`)VALUES('"+idUser+"', '"+idEvent+"')");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public int getIdUser(String name, String paswd){
+		int id = 0;
+		try{
+			Statement state =  conn.createStatement();
+			ResultSet result = state.executeQuery("SELECT iduser FROM user where name LIKE '"+name+"' AND password LIKE '"+paswd+"'");
+			result.next();
+			id = Integer.parseInt(result.getObject(1).toString());
+			result.close();
+			state.close();
+			return id;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return id;
+		}
+	}
+	
+	public int getIdEvent(String description, String date){
+		int id = 0;
+		try{
+			date = date.replaceAll("/", "-");
+			//System.out.println("real "+date);
+			Statement state =  conn.createStatement();
+			ResultSet result = state.executeQuery("SELECT idEvent FROM event where description_event LIKE '"+description+"' AND date_event LIKE '"+date+"'");
+			result.next();
+			id = Integer.parseInt(result.getObject(1).toString());
+			result.close();
+			state.close();
+			return id;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return id;
+		}
+	}
+	
+	
+	public ArrayList afficheEvent(int IdUser, String date){
+		ArrayList al = new ArrayList();
+		try{
+			date = date.replaceAll("/", "-");
+			Statement state =  conn.createStatement();
+			ResultSet result = state.executeQuery("SELECT name_event, description_event, date_event FROM event, event_user WHERE event.idEvent = event_user.event_user_idevent AND event_user_iduesr LIKE '"+IdUser+"' AND date_event LIKE '"+date+"'");
+			ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
+	         
+			while(result.next()){         
+				  String[] obj = new String[]{result.getObject(1).toString(), result.getObject(2).toString(), result.getObject(3).toString()};
+				  al.add(obj);
+			}
+			result.next();
+			result.close();
+			state.close();
+			return al;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return al;
+		}
+	}
+	
+	public ArrayList selectEvent(int IdUser){
+		ArrayList al = new ArrayList();
+		try{
+			Statement state =  conn.createStatement();
+			ResultSet result = state.executeQuery("SELECT date_event FROM event, event_user WHERE event.idEvent = event_user.event_user_idevent AND event_user_iduesr LIKE '"+IdUser+"'");
+			ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
+	         
+			while(result.next()){         
+				  String[] obj = new String[]{result.getObject(1).toString()};
+				  al.add(obj);
+			}
+			result.next();
+			result.close();
+			state.close();
+			return al;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return al;
+		}
+	}
+
 }

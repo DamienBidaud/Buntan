@@ -24,7 +24,9 @@ import BDD.BDD;
 import Vue.ChangeTag.EcouteurModif;
 
 public class UserIdentification extends JFrame{
-
+	
+	public static int IDUSER = 0;
+	
 	private JTextField t1;
 	private JPasswordField t2;
 	
@@ -113,7 +115,7 @@ public class UserIdentification extends JFrame{
 		b1.addActionListener(new UserListener());
 		jPan.add(b1, containt);
 		
-		JButton b2 = new JButton("Create acount");
+		JButton b2 = new JButton("Create account");
 		containt.gridx = 2;
 		containt.gridy = 3;
 		containt.gridwidth = 1;

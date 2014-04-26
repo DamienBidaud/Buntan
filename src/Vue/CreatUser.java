@@ -57,7 +57,9 @@ public class CreatUser extends JFrame{
 	public CreatUser(){
 		this.setTitle("Buntan");
 		this.setSize(600, 400);
-		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
+		this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        this.setIconImage(new ImageIcon("./src/images/icone.png").getImage());
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setVisible(true);		
 		this.initisalise();
@@ -143,7 +145,7 @@ public class CreatUser extends JFrame{
 		containt.gridy = 3;
 		jPan.add(t4, containt);
 		
-		JButton b1 = new JButton("Creat acount");
+		JButton b1 = new JButton("Create account");
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.weightx = 0.0;
 		containt.weighty = 1.0;

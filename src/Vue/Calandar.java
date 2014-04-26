@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -15,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 	public class Calandar extends JPanel {
@@ -134,7 +136,7 @@ import javax.swing.JPanel;
 		    bp.add(new JButton("M"));
 		    bp.add(new JButton("T"));
 		    bp.add(new JButton("W"));
-		    bp.add(new JButton("R"));
+		    bp.add(new JButton("T"));
 		    bp.add(new JButton("F"));
 		    bp.add(new JButton("S"));
 
@@ -150,6 +152,29 @@ import javax.swing.JPanel;
 		        }
 		      }
 		    };
+			
+			// Call new event window
+		    ActionListener newEvent = new ActionListener() {
+		      public void actionPerformed(ActionEvent e) {
+		        String num = e.getActionCommand();
+		        if (!num.equals("")) {
+		        	int nb = Integer.parseInt(num);
+		        	if (nb < 10){
+		        		num = "0"+num;
+		        	}
+		        	String month;
+		        	// Décalage de 1
+		        	if ((mm+1) < 10){
+		        		month = "0"+(mm+1);
+		        	} else {
+		        		month = ""+(mm+1);
+		        	}
+		        	String date = yy+"/"+month+"/"+num;
+		        	Event fenetreEvent = new Event(date);
+		        }
+		      }
+			};
+			
 
 		    // Construct all the buttons, and add them.
 		    for (int i = 0; i < 6; i++)
@@ -204,6 +229,15 @@ import javax.swing.JPanel;
 		    // Shade current day, only if current month
 		    if (thisYear == yy && mm == thisMonth)
 		      setDayActive(dd); // shade the box for today
+			  
+			BDD bd = new BDD();
+		    ArrayList arrList = new ArrayList();
+		    arrList = bd.selectEvent(UserIdentification.IDUSER);
+		    for(int i=0; i<arrList.size(); i++) {
+				String[] value = (String[]) arrList.get(i);
+				String word = value[0].substring(8, 10);
+				setEventYellow(Integer.parseInt(word));
+			}
 
 		    // Say we need to be drawn on the screen
 		    repaint();
@@ -261,6 +295,13 @@ import javax.swing.JPanel;
 		    square.setBackground(Color.red);
 		    square.repaint();
 		    activeDay = newDay;
+		  }
+		  
+		  public void setEventYellow(int day) {
+		    // Now shade the correct square
+		    Component square = labs[(leadGap + day - 1) / 7][(leadGap + day - 1) % 7];
+		    square.setBackground(Color.yellow);
+		    square.repaint();
 		  }
 	
 }
