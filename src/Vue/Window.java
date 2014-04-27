@@ -270,15 +270,12 @@ public class Window extends JFrame{
 				JFileChooser filChose = new JFileChooser();
 				int retval = filChose.showDialog(filChose, null);
 				String file = filChose.getSelectedFile().getAbsolutePath();
-				//System.out.println(file);
 				bd.insertMusic(filChose.getSelectedFile().getName(), file, idUser);
 				ID3Tags tag = new ID3Tags(file);
 				Object[] donne = new Object[]{table.getRowCount()+1, tag.getSongName(), tag.getTime(), tag.getArtist(), tag.getAlbum(), tag.getGenre(), "0"};
 				((MyTable) table.getModel()).addRow(donne);
 			}
 			if(event.equals("ajouter video")){
-//				File f = new File("C:\\Users\\Damien\\Videos\\[D-J-F] Hanazakari no kimitachi e Final Live Special vostf.avi");
-//				System.out.println(f.getName());
 				JFileChooser filChose = new JFileChooser();
 				int retval = filChose.showDialog(filChose, null);
 				String file = filChose.getSelectedFile().getAbsolutePath();
@@ -298,7 +295,6 @@ public class Window extends JFrame{
 						String[] val =  (String[]) el.get(table.getSelectedRow());
 						File f = new File(val[0]);
 						String name = f.getName();
-						//name = name.substring(1, name.length());
 						bd.deleteMusic(name, idUser);
 						((MyTable) table.getModel()).removeRow(table.getSelectedRow());
 					}
@@ -313,7 +309,6 @@ public class Window extends JFrame{
 						String[] val =  (String[]) el.get(tableV.getSelectedRow());
 						File f = new File(val[0]);
 						String name = f.getName();
-						//name = name.substring(1, name.length());
 						bd.deleteMusic(name, idUser);
 						((MyTable) tableV.getModel()).removeRow(tableV.getSelectedRow());					}
 				}
@@ -410,7 +405,6 @@ public class Window extends JFrame{
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			// TODO Auto-generated method stub
-			//System.out.println(play.getSelectedItem());
 			bd.updateNote(Integer.parseInt((String) play.getSelectedItem()), idUser, table.getSelectedRow()+1);
 		}
 
@@ -709,7 +703,7 @@ public class Window extends JFrame{
 		jTab.add(jPan4, "Video");
 		ArrayList video = bd.selectVideo(idUser);
 		String title2[] = {"number", "name", "note"};
-		String data2[][] = new String[media.size()][title2.length];
+		String data2[][] = new String[video.size()][title2.length];
 		for(int i = 0; i < video.size(); i++){
 			String[] vid = (String[]) video.get(i);
 			File f = new File(vid[0]);
