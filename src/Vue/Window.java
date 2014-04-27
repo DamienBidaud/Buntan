@@ -87,6 +87,7 @@ public class Window extends JFrame{
 	private JTextArea artiste;
 	private JTabbedPane jTab;
 	private JComboBox play;
+	private JComboBox playlist;
 	private int idUser;
 	private String pluginFolder;
 	
@@ -195,9 +196,16 @@ public class Window extends JFrame{
 					}
 					else{
 						el = bd.selectMusic(idUser);
-						String[] val =  (String[]) el.get(table.getSelectedRow());
-						name = val[0];
-						name = name.substring(1, name.length());
+						for(int i = 0; i < el.size(); i++){
+							String[] val =  (String[]) el.get(i);
+							name = val[0];
+							name = name.substring(1, name.length());
+							if(name.contains((CharSequence) table.getValueAt(table.getSelectedRow(), 1))){
+								break;
+							}
+						}
+						
+						System.out.println(name);
 						if(pauses == false){
 							setTrack(name);
 					       
@@ -426,6 +434,21 @@ public class Window extends JFrame{
 		}
 		
 	}
+
+	class ChargePlaylist implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			if(!play.getSelectedItem().equals("Pas de playlist créer")){
+				System.out.println(playlist.getSelectedItem().toString());
+				ArrayList media = bd.selectPlaylistElement(idUser, playlist.getSelectedItem().toString());
+				if(!media.isEmpty())
+					refresch(media);
+			}
+		}
+		
+	}
 	
 	public Window(int idUser){
 		this.setTitle("Buntan");
@@ -582,16 +605,32 @@ public class Window extends JFrame{
 		containt.gridx = 0;
 		containt.gridy = 10;
 		jPan.add(b5, containt);
-		JComboBox play = new JComboBox();
-		play.addItem("Disney");
+		playlist = new JComboBox();
+		ArrayList pl = bd.selectPlaylist(idUser);
+		if(pl.isEmpty())
+			playlist.addItem("Pas de playlist créer");
+		else{
+			for(int i = 0; i < pl.size(); i++){
+				playlist.addItem(pl.get(i));
+			}
+		}
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.weightx = 0.0;
 		containt.weighty = 1.0;
 		containt.gridwidth = 3;
 		containt.gridx = 0;
 		containt.gridy = 11;
-		jPan.add(play, containt);
+		jPan.add(playlist, containt);
 		
+		JButton b9 = new JButton("Afficher playlist");
+		containt.fill = GridBagConstraints.HORIZONTAL;
+		containt.weightx = 0.0;
+		containt.weighty = 1.0;
+		containt.gridwidth = 3;
+		containt.gridx = 0;
+		containt.gridy = 12;
+		b9.addActionListener(new ChargePlaylist());
+		jPan.add(b9, containt);		
 		
 		JButton b6 = new JButton("Create playlist");
 		containt.fill = GridBagConstraints.HORIZONTAL;
@@ -599,7 +638,15 @@ public class Window extends JFrame{
 		containt.weighty = 1.0;
 		containt.gridwidth = 3;
 		containt.gridx = 0;
-		containt.gridy = 12;
+		containt.gridy = 13;
+		b6.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				new CreatePlaylist(idUser);
+			}
+		});
 		jPan.add(b6, containt);
 		
 		return jPan;
@@ -799,6 +846,7 @@ public class Window extends JFrame{
 		table.revalidate();
 		table.repaint();
 	}
+	
 	public void checkPlugin(){
 		File dossier = new File("Plugin"); 
 		if(!dossier.exists()){

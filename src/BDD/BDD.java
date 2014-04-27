@@ -59,6 +59,58 @@ public class BDD {
 		}
 	}
 	
+		
+	public ArrayList selectPlaylist(int idUser){
+		try {
+			ArrayList playlist = new ArrayList();
+
+			Statement state = (Statement) conn.createStatement();
+			ResultSet result = state.executeQuery("Select Name from playlist where iduserpro = "+idUser);
+			ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
+			while(result.next()){ 
+				String obj = result.getObject(1).toString();
+				playlist.add(obj);        
+			
+		}
+			result.close();
+			state.close();
+			return playlist;
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public ArrayList selectPlaylistElement(int idUser, String name){
+		try {
+			ArrayList playlist = new ArrayList();
+
+			Statement state = (Statement) conn.createStatement();
+			ResultSet r = state.executeQuery("Select idplaylist from playlist where Name LIKE \""+name+"\" and iduserpro = "+idUser);
+			r.next();
+			int id = Integer.parseInt(r.getObject(1).toString());
+			String music = "SELECT DISTINCT file_road, note FROM media,music,appartien, isinplayliste where media.id_media = music.id_media and media.id_media = appartien.id_media_fk and appartien.id_user_fk ="+idUser+" and isinplayliste.idMediaIn = media.id_media and isinplayliste.idPlaylistIn = "+id;
+			ResultSet result = state.executeQuery(music);
+			ResultSetMetaData resultMeta = (ResultSetMetaData) result.getMetaData();
+	         
+			while(result.next()){ 
+					String[] obj = new String[]{result.getObject(1).toString(), result.getObject(2).toString()};
+					playlist.add(obj);        
+				
+			}
+			result.close();
+			state.close();
+			return playlist;
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+	}
 	
 	public ArrayList selectVideo(int idUser){
 		try {
@@ -264,6 +316,30 @@ public class BDD {
 			String del = "DELETE FROM appartien where id_user_fk="+idUser+" and id_media_fk="+id+"";
 			state.executeUpdate(del);
 			state.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void creerPlaylist(ArrayList name, int idUser, String nameP){
+		Statement state;
+		
+		try {
+			state = conn.createStatement();
+			String create = "INSERT INTO `buntan`.`playlist`(`Name`,`iduserpro`) VALUES (\""+nameP+"\","+idUser+")";
+			state.executeUpdate(create);
+			ResultSet r = state.executeQuery("Select idplaylist from playlist where Name LIKE \""+nameP+"\" and iduserpro = "+idUser);
+			r.next();
+			int id = Integer.parseInt(r.getObject(1).toString());
+			for(int i = 0; i< name.size(); i++){
+				ResultSet result = state.executeQuery("SELECT id_media from media where Name like '"+name.get(i)+"'");
+				result.next();
+				int idM = Integer.parseInt(result.getObject(1).toString());
+				state.executeUpdate("INSERT INTO `buntan`.`isinplayliste` (`idPlaylistIn`,`idMediaIn`) VALUES("+id+","+idM+");");
+			}
+			state.close();
+			r.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

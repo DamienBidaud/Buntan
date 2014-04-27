@@ -30,6 +30,62 @@ import Vue.Window.menuListeneur;
 
 public class CreatePlaylist extends JFrame{
 
+	private BDD bd;
+	private int idUser;
+	private JList l1;
+	private JList l2;
+	private JTextField t1;
+	
+	
+	class ActionPlaylist implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			String event = e.getActionCommand();
+			
+			if(event.equals("add")){
+				String value = (String) l1.getSelectedValue();
+				int idEl = l1.getSelectedIndex();
+				if(idEl > -1)
+					((DefaultListModel) l1.getModel()).remove(idEl);
+				((DefaultListModel) l2.getModel()).addElement(value);
+			}
+			else{
+				String value = (String) l2.getSelectedValue();
+				int idEl = l2.getSelectedIndex();
+				if(idEl > -1)
+					((DefaultListModel) l2.getModel()).remove(idEl);
+				((DefaultListModel) l1.getModel()).addElement(value);
+			}
+		}
+		
+	}
+	
+	
+	class CreerPlaylist implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			if(t1.getText().isEmpty()){
+				JOptionPane jOP = new JOptionPane();
+				jOP.showMessageDialog(null, "Veuillez séléctionner une music", "Attention", JOptionPane.WARNING_MESSAGE);
+			}
+			else{
+				ArrayList name = new ArrayList();
+				for(int i = 0; i < l2.getModel().getSize(); i++){
+					name.add(l2.getModel().getElementAt(i));
+				}
+				bd.creerPlaylist(name, idUser, t1.getText());
+				JOptionPane jOP = new JOptionPane();
+				jOP.showMessageDialog(null, "Playlist créer", "Attention", JOptionPane.WARNING_MESSAGE);
+			}
+			
+		}
+		
+	}
+	
 	public CreatePlaylist(){
 		this.setTitle("Buntan");
 		this.setSize(700, 500);
@@ -37,6 +93,18 @@ public class CreatePlaylist extends JFrame{
         this.setResizable(false);
         this.setIconImage(new ImageIcon("./src/images/icone.png").getImage());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.initisalise();
+		this.setVisible(true);
+	}
+	
+	
+	public CreatePlaylist(int idUser){
+		this.idUser = idUser;
+		this.bd = new BDD();
+		this.setTitle("Buntan");
+		this.setSize(700, 500);
+		this.setIconImage(new ImageIcon("logoProjet.png").getImage());
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.initisalise();
 		this.setVisible(true);
 	}
@@ -65,7 +133,7 @@ public class CreatePlaylist extends JFrame{
 		containt.gridy = 0;
 		containt.weighty = 1.0;
 		jPan.add(labl1, containt);
-		JTextField t1 = new JTextField();
+		t1 = new JTextField();
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.weightx = 1.0;
 		containt.weighty = 1.0;
@@ -81,12 +149,21 @@ public class CreatePlaylist extends JFrame{
 		JPanel jPan = new JPanel();
 		jPan.setLayout(new GridBagLayout());
 		GridBagConstraints containt = new GridBagConstraints();
-		String[] data = {"Song 1", "Song 2", "Song 3", "Song 4"};
-		JList b1 = new JList(data);
-		b1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		b1.setLayoutOrientation(JList.VERTICAL);
-		b1.setVisibleRowCount(-1);
-		JScrollPane listScroller = new JScrollPane(b1);
+		ArrayList music = bd.selectMusic(idUser);
+		l1 = new JList();
+		DefaultListModel model = new DefaultListModel<>();
+		for(int i = 0; i< music.size(); i++){
+			String[] fich = (String[]) music.get(i);
+			String file = fich[0];
+			file = file.substring(1,file.length() );
+			File f = new File(file); 
+			model.addElement(f.getName());
+		}
+		l1.setModel(model);
+		l1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		l1.setLayoutOrientation(JList.VERTICAL);
+		l1.setVisibleRowCount(-1);
+		JScrollPane listScroller = new JScrollPane(l1);
 		listScroller.setPreferredSize(new Dimension(250, 80));
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.gridx = 0;
@@ -101,13 +178,12 @@ public class CreatePlaylist extends JFrame{
 		JPanel jPan = new JPanel();
 		jPan.setLayout(new GridBagLayout());
 		GridBagConstraints containt = new GridBagConstraints();
-		
-		String[] data = { "Song 3"};
-		JList b1 = new JList(data);
-		b1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		b1.setLayoutOrientation(JList.VERTICAL);
-		b1.setVisibleRowCount(-1);
-		JScrollPane listScroller = new JScrollPane(b1);
+		l2 = new JList();
+		l2.setModel(new DefaultListModel());
+		l2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		l2.setLayoutOrientation(JList.VERTICAL);
+		l2.setVisibleRowCount(-1);
+		JScrollPane listScroller = new JScrollPane(l2);
 		listScroller.setPreferredSize(new Dimension(250, 80));
 		containt.fill = GridBagConstraints.HORIZONTAL;
 		containt.gridx = 0;
@@ -128,6 +204,7 @@ public class CreatePlaylist extends JFrame{
 		containt.gridx = 0;
 		containt.gridy = 0;
 		containt.weighty = 1.0;
+		b1.addActionListener(new CreerPlaylist());
 		jPan.add(b1, containt);
 		
 		
@@ -144,8 +221,15 @@ public class CreatePlaylist extends JFrame{
 		containt.gridx = 0;
 		containt.gridy = 0;
 		containt.weighty = 1.0;
+		b1.addActionListener(new ActionPlaylist());
 		jPan.add(b1, containt);
-		
+	
+		JButton b2 = new JButton("remove");
+		containt.fill = GridBagConstraints.HORIZONTAL;
+		containt.gridx = 0;
+		containt.gridy = 1;
+		containt.weighty = 1.0;
+		jPan.add(b2, containt);
 		return jPan;
 	}
 	
