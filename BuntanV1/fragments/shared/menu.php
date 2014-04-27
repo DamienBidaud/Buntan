@@ -1,5 +1,6 @@
-<?php include $_SERVER['DOCUMENT_ROOT'].'/BuntanV1/fragments/shared/header.php'; ?>
-
+<?php include $_SERVER['DOCUMENT_ROOT'].'/BuntanV1/fragments/shared/header.php'; 
+include $_SERVER['DOCUMENT_ROOT'] . '/BuntanV1/services/database/database.php';
+?>
 
 	<div id="page">
 		<div id="content-header">
