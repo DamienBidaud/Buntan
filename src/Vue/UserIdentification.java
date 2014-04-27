@@ -39,6 +39,8 @@ public class UserIdentification extends JFrame{
 			String event = e.getActionCommand();
 			if(event.equals("Connection")){
 				if(bd.idUser(t1.getText(), t2.getText())){
+					int id = bd.getIdUser(t1.getText(), t2.getText());
+					IDUSER = id;
 					Window w = new Window(bd.idUserExpo(t1.getText()));
 					dispose();
 				}

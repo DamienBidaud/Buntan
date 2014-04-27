@@ -19,6 +19,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import BDD.BDD;
+
 	public class Calandar extends JPanel {
 		  /** The currently-interesting year (not modulo 1900!) */
 		  protected int yy;
@@ -181,6 +183,7 @@ import javax.swing.JPanel;
 		      for (int j = 0; j < 7; j++) {
 		        bp.add(labs[i][j] = new JButton(""));
 		        labs[i][j].addActionListener(dateSetter);
+				labs[i][j].addActionListener(newEvent);
 		      }
 
 		    add(BorderLayout.SOUTH, bp);
