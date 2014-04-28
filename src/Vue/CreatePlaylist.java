@@ -229,6 +229,7 @@ public class CreatePlaylist extends JFrame{
 		containt.gridx = 0;
 		containt.gridy = 1;
 		containt.weighty = 1.0;
+		b2.addActionListener(new ActionPlaylist());
 		jPan.add(b2, containt);
 		return jPan;
 	}

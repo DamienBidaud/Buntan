@@ -200,7 +200,8 @@ public class Window extends JFrame{
 							String[] val =  (String[]) el.get(i);
 							name = val[0];
 							name = name.substring(1, name.length());
-							if(name.contains((CharSequence) table.getValueAt(table.getSelectedRow(), 1))){
+							ID3Tags music = new ID3Tags(name);
+							if(table.getValueAt(table.getSelectedRow(), 1).equals(music.getSongName())){
 								break;
 							}
 						}
