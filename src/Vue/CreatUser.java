@@ -38,12 +38,12 @@ public class CreatUser extends JFrame{
 			BDD bd = new BDD();
 			if(t1.getText().equals("") || t2.getText().equals("")|| t3.getText().equals("")|| t4.getText().equals("")){
 				JOptionPane jOP = new JOptionPane();
-				jOP.showMessageDialog(null, "Toutes les information n'ont pas été remplis.", "Attention", JOptionPane.WARNING_MESSAGE);
+				jOP.showMessageDialog(null, "Toutes les informations n'ont pas été remplies.", "Attention", JOptionPane.WARNING_MESSAGE);
 			}
 			else{
 				if(!t2.getText().equals(t3.getText())){
 					JOptionPane jOP = new JOptionPane();
-					jOP.showMessageDialog(null, "Les mots de passes ne sont pas identique.", "Attention", JOptionPane.WARNING_MESSAGE);
+					jOP.showMessageDialog(null, "Les mots de passe ne sont pas identiques.", "Attention", JOptionPane.WARNING_MESSAGE);
 				}
 				else{
 					bd.insertUser(t1.getText(), t2.getText(), t4.getText());
